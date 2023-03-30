@@ -1,0 +1,15 @@
+server:
+  port: 8077
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user?currentShema=public
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+
