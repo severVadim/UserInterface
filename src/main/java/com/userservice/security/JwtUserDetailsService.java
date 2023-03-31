@@ -1,6 +1,5 @@
 package com.userservice.security;
 
-import com.userservice.exception.UserIsNotVerifiedException;
 import com.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;

@@ -1,19 +1,13 @@
 package com.userservice.component;
 
 import com.userservice.security.JwtTokenUtil;
-import com.userservice.service.UserService;
-import jakarta.mail.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import com.userservice.model.User;
 
-import java.util.UUID;
-
-import static jakarta.mail.Transport.send;
 
 @Component
 @RequiredArgsConstructor

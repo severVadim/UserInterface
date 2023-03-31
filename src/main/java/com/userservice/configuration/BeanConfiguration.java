@@ -3,18 +3,11 @@ package com.userservice.configuration;
 
 import com.userservice.model.Role;
 import com.userservice.model.User;
-import com.userservice.model.UserDto;
 import com.userservice.repository.UserRepository;
-import com.userservice.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Properties;
 
 @Configuration
 @RequiredArgsConstructor

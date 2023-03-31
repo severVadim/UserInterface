@@ -4,7 +4,6 @@ import com.userservice.exception.UserAlreadyExistException;
 import com.userservice.model.Role;
 import com.userservice.model.User;
 import com.userservice.model.UserDto;
-import com.userservice.model.UserInfoDto;
 import com.userservice.repository.UserRepository;
 import com.userservice.security.model.UserDetailsImpl;
 import com.userservice.service.PasswordManager;

@@ -2,15 +2,13 @@ package com.userservice.controller;
 
 
 import com.userservice.component.OnRegistrationCompleteEvent;
-import com.userservice.exception.UserIsNotVerifiedException;
-import com.userservice.service.PasswordManager;
-import com.userservice.security.JwtTokenUtil;
-import com.userservice.security.JwtUserDetailsService;
 import com.userservice.exception.UserAlreadyExistException;
-import com.userservice.model.token.JwtRequest;
 import com.userservice.model.User;
 import com.userservice.model.UserDto;
-import com.userservice.model.token.JwtResponse;
+import com.userservice.model.token.JwtRequest;
+import com.userservice.security.JwtTokenUtil;
+import com.userservice.security.JwtUserDetailsService;
+import com.userservice.service.PasswordManager;
 import com.userservice.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
