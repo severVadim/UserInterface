@@ -5,34 +5,43 @@ import com.userservice.model.Role;
 import com.userservice.model.User;
 import com.userservice.model.UserDto;
 import com.userservice.repository.UserRepository;
+import com.userservice.service.PasswordManager;
 import com.userservice.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordManager passwordManager;
     @Override
     public User registerNewUserAccount(UserDto userDto) {
         if (emailExists(userDto.getEmail())){
             throw new UserAlreadyExistException(String.format("Email %s already is used", userDto.getEmail()));
         }
-        return userRepository.save(convertToUser(userDto));
+        return userRepository.save(convertToAfterRegistration(userDto));
     }
 
 
-    private User convertToUser(UserDto userDto){
+    @Override
+    public void saveRegisteredUser(User user) {
+        userRepository.save(user);
+    }
+
+
+    private User convertToAfterRegistration(UserDto userDto){
         return User.builder()
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())
                 .role(Role.REGULAR.name())
-                .password(passwordEncoder.encode(userDto.getPassword())).build();
+                .enabled(false)
+                .password(passwordManager.encodePassword(userDto.getPassword())).build();
     }
 
     private boolean emailExists(String email) {

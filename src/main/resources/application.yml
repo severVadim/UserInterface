@@ -12,4 +12,13 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    protocol: smtps
+    username: severinenko.vadim@gmail.com
+    password: Dragoivan1
 
+
+jwt:
+  secret: secret
