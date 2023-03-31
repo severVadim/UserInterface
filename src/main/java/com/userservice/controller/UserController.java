@@ -3,9 +3,8 @@ package com.userservice.controller;
 
 import com.userservice.component.OnRegistrationCompleteEvent;
 import com.userservice.service.PasswordManager;
-import com.userservice.service.impl.PasswordManagerImpl;
-import com.userservice.component.token.JwtTokenUtil;
-import com.userservice.component.token.JwtUserDetailsService;
+import com.userservice.security.JwtTokenUtil;
+import com.userservice.security.JwtUserDetailsService;
 import com.userservice.exception.UserAlreadyExistException;
 import com.userservice.model.token.JwtRequest;
 import com.userservice.model.User;
@@ -17,12 +16,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,6 +44,7 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtUserDetailsService userDetailsService;
     private final PasswordManager passwordManager;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
     public ResponseEntity<?> userRegistration(@RequestBody @Valid UserDto userDto, final BindingResult bindingResult, HttpServletRequest request) {
@@ -56,8 +64,8 @@ public class UserController {
 
 
     @GetMapping("/name")
-    public ResponseEntity<?> getUser() {
-        return ResponseEntity.status(HttpStatus.OK).body("dsadsadas ");
+    public ResponseEntity<?> getUser(Principal user) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(user.getName()));
     }
 
 //    @GetMapping("/regitrationConfirm")
@@ -79,26 +87,38 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).build();
 //    }
 
-    @PostMapping( "/authenticate")
+    @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 
         UserDetails userDetails;
         try {
-             userDetails = userDetailsService
+            userDetails = userDetailsService
                     .loadUserByUsername(authenticationRequest.getEmail());
-        } catch (UsernameNotFoundException e){
+            authenticationManager
+                    .authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    authenticationRequest.getEmail(), authenticationRequest.getPassword()
+                            )
+                    );
+
+        } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (DisabledException | BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!passwordManager.matchPassword(userDetails.getPassword(), authenticationRequest.getPassword())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is incorrect");
+        if (!passwordManager.matchPassword(userDetails.getPassword(), authenticationRequest.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String token = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.AUTHORIZATION,
+                        jwtTokenUtil.generateToken(userDetails)
+                )
+                .body(userService.getUserInfo(userDetails.getUsername()));
     }
-
 
 
     private String collectErrors(BindingResult bindingResult) {

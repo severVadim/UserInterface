@@ -1,4 +1,4 @@
-package com.userservice.component.token;
+package com.userservice.security;
 
 import com.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

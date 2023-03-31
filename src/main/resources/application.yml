@@ -17,8 +17,13 @@ spring:
     port: 465
     protocol: smtps
     username: severinenko.vadim@gmail.com
-    password: Dragoivan1
-
+    password: dsadasdaf
+    properties:
+      mail:
+        smtp:
+          auth=true:
+      starttls:
+        enable=true:
 
 jwt:
   secret: secret

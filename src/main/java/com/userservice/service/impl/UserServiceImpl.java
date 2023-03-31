@@ -4,12 +4,17 @@ import com.userservice.exception.UserAlreadyExistException;
 import com.userservice.model.Role;
 import com.userservice.model.User;
 import com.userservice.model.UserDto;
+import com.userservice.model.UserInfoDto;
 import com.userservice.repository.UserRepository;
+import com.userservice.security.model.UserDetailsImpl;
 import com.userservice.service.PasswordManager;
 import com.userservice.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -31,6 +36,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public UserDetailsImpl getUserInfo(String email) {
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        if (byEmail.isEmpty()){
+            throw new UsernameNotFoundException(String.format("User with email %s not found", email));
+        }
+        return UserDetailsImpl.build(byEmail.get());
     }
 
 
