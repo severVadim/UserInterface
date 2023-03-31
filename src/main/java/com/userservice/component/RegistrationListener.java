@@ -1,5 +1,6 @@
 package com.userservice.component;
 
+import com.userservice.security.JwtTokenUtil;
 import com.userservice.service.UserService;
 import jakarta.mail.Message;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import static jakarta.mail.Transport.send;
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 
     private final JavaMailSender mailSender;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
@@ -30,13 +32,13 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";
-        String confirmationUrl 
-          = event.getAppUrl() + "/regitrationConfirm?token=" + "token";
         SimpleMailMessage email = new SimpleMailMessage();
-        email.setFrom("noreply@baeldung.com");
+        email.setFrom(recipientAddress);
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText("\r\n" + "http://localhost:8080" + confirmationUrl);
+        String link = String.format("http://localhost:3000/confirm?token=%s", jwtTokenUtil.generateToken(user.getEmail()));
+        email.setText("\r\n" + String.format("Hello %s, click on link from below to activate your account ", user.getFirstName()) +
+                "\r\n" + link);
         mailSender.send(email);
     }
 }

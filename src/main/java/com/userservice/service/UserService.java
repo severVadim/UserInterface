@@ -11,4 +11,6 @@ public interface UserService {
     void saveRegisteredUser(User user);
     UserDetailsImpl getUserInfo(String email);
 
+    void verifyUser(String email);
+
 }

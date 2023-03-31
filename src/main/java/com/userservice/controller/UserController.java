@@ -2,6 +2,7 @@ package com.userservice.controller;
 
 
 import com.userservice.component.OnRegistrationCompleteEvent;
+import com.userservice.exception.UserIsNotVerifiedException;
 import com.userservice.service.PasswordManager;
 import com.userservice.security.JwtTokenUtil;
 import com.userservice.security.JwtUserDetailsService;
@@ -68,24 +69,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(user.getName()));
     }
 
-//    @GetMapping("/regitrationConfirm")
-//    public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-//
-//        VerificationToken verificationToken = userService.getVerificationToken(token);
-//        if (verificationToken == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
-//
-//        User user = verificationToken.getUser();
-//        Calendar cal = Calendar.getInstance();
-//        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
-//
-//        user.setEnabled(true);
-//        userService.saveRegisteredUser(user);
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirmRegistration(Principal principal) {
+        userService.verifyUser(principal.getName());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
@@ -103,9 +91,12 @@ public class UserController {
 
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (DisabledException | BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User account is not verified");
         }
+
 
         if (!passwordManager.matchPassword(userDetails.getPassword(), authenticationRequest.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

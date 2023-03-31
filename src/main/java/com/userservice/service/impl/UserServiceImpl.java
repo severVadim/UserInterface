@@ -47,6 +47,15 @@ public class UserServiceImpl implements UserService {
         return UserDetailsImpl.build(byEmail.get());
     }
 
+    @Override
+    public void verifyUser(String email) {
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        if (byEmail.isEmpty()){
+            throw new UsernameNotFoundException(String.format("User with email %s not found", email));
+        }
+        byEmail.get().setEnabled(true);
+    }
+
 
     private User convertToAfterRegistration(UserDto userDto){
         return User.builder()

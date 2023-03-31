@@ -20,7 +20,7 @@ public class JwtTokenUtil implements Serializable {
 
     @Value("${jwt.secret}")
     private String secret;
-    private static final long jwtExpiration = 60;
+    private static final long jwtExpiration = 60 * 60 * 60;
 
 
     public String extractUsername(String token) {
@@ -52,6 +52,11 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getUsername());
+    }
+
+    public String generateToken(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        return doGenerateToken(claims, email);
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {

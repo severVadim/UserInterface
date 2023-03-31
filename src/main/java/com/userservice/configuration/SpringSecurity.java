@@ -75,7 +75,7 @@ public class SpringSecurity {
                 authorize.requestMatchers("/users/authenticate").permitAll()
         );
 
-        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/users/name").authenticated());
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/users/**").authenticated());
 
         return http.build();
     }
